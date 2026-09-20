@@ -124,6 +124,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .quiz-setup[hidden],.tray[hidden]{display:none}
 .quiz-title{font-family:var(--serif);font-size:20px;line-height:1.1;margin-bottom:8px}
 .quiz-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px}
+.quiz-fields .wide{grid-column:1 / -1}
 .quiz-fields label{display:flex;flex-direction:column;gap:4px;color:var(--tx-dim);font-size:11px}
 .quiz-fields select{width:100%;background:var(--panel);border:1px solid var(--rule);border-radius:2px;padding:7px 8px;color:inherit;font:inherit;font-size:13px}
 .quiz-start{width:100%;border:1px solid var(--gold);border-radius:2px;background:var(--gold);color:#fff;padding:8px 10px;font-size:13px;font-weight:600}
@@ -235,6 +236,17 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     <div class="quiz-setup" id="quizSetup" hidden>
       <div class="quiz-title">Skapa ett quiz</div>
       <div class="quiz-fields">
+        <label class="wide" for="quizRegion">Världsdel
+          <select id="quizRegion">
+            <option value="">Hela världen</option>
+            <option value="Afrika">Afrika</option>
+            <option value="Asien">Asien</option>
+            <option value="Europa">Europa</option>
+            <option value="Nordamerika">Nordamerika</option>
+            <option value="Oceanien">Oceanien</option>
+            <option value="Sydamerika">Sydamerika</option>
+          </select>
+        </label>
         <label for="quizKind">Frågetyp
           <select id="quizKind">
             <option value="country">Länder</option>
@@ -473,7 +485,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   var quizPointerClickHandled = false;
   var quiz = {
     active:false, finished:false, kind:"country", length:"10", questions:[], index:0,
-    score:0, attempts:3, current:null, answered:false, feedback:"", options:[], results:[]
+    region:"", regionBox:null, score:0, attempts:3, current:null, answered:false,
+    autoAdvance:false, feedback:"", options:[], results:[], run:0
   };
 
   svg.addEventListener("click", function(e){
@@ -553,7 +566,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     return n == null ? "—" : Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   }
 
-  var quizPool = DATA.countries.filter(function(c){ return c.cap && (c.d || c.hit); });
+  var allQuizPool = DATA.countries.filter(function(c){ return c.cap && (c.d || c.hit); });
+  var quizPool = allQuizPool;
 
   function shuffle(list){
     var copy = list.slice();
@@ -587,6 +601,26 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   function quizLengthLabel(){
     return quiz.length === "all" ? "alla" : quiz.length;
   }
+  function countryBox(c){
+    if(c.z && c.z.length===4)return c.z;
+    if(c.d)return bboxFromPath(c.d);
+    if(c.hit)return [c.hit[0]-30,c.hit[1]-30,60,60];
+    return null;
+  }
+  function boxForCountries(pool){
+    var x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
+    pool.forEach(function(c){
+      var b=countryBox(c);if(!b)return;
+      x0=Math.min(x0,b[0]);y0=Math.min(y0,b[1]);
+      x1=Math.max(x1,b[0]+b[2]);y1=Math.max(y1,b[1]+b[3]);
+    });
+    return Number.isFinite(x0) ? [x0,y0,x1-x0,y1-y0] : [VB[0],VB[1],VB[2],VB[3]];
+  }
+  function focusQuizArea(){
+    var box=quiz.region ? quiz.regionBox : [VB[0],VB[1],VB[2],VB[3]];
+    var pad=quiz.region ? Math.max(box[2],box[3])*.08 : 0;
+    centerBox(box,pad);
+  }
   function renderQuizIntro(){
     pbody.innerHTML='<div class="quiz-card"><p class="quiz-kicker">Quizläge</p><h2>Redo att testa kartkunskaperna?</h2><p class="quiz-intro">Välj frågetyp och antal frågor ovan. Du får tre försök per fråga.</p><ul class="quiz-rules"><li>Första försöket ger 3 poäng.</li><li>Andra försöket ger 2 poäng.</li><li>Tredje försöket ger 1 poäng.</li><li>Efter tre fel visas rätt svar och du får 0 poäng.</li></ul><p class="quiz-intro">Länder besvaras genom klick på kartan. Huvudstäder besvaras med fyra alternativ.</p></div>';
   }
@@ -605,7 +639,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
         return '<button type="button" class="'+cls+'" data-quiz-answer="'+esc(option.i)+'"'+(quiz.answered?' disabled':'')+'>'+esc(option.cap)+'</button>';
       }).join("")+'</div>';
     }
-    if(quiz.answered)html+='<button type="button" class="quiz-next" id="quizNext">'+(quiz.index+1<total?'Nästa fråga →':'Visa resultat')+'</button>';
+    if(quiz.answered && !quiz.autoAdvance)html+='<button type="button" class="quiz-next" id="quizNext">'+(quiz.index+1<total?'Nästa fråga →':'Visa resultat')+'</button>';
     html+='</div>';
     pbody.innerHTML=html;
     if(quiz.kind==="capital")pbody.querySelectorAll("[data-quiz-answer]").forEach(function(button){button.addEventListener("click",function(){handleCapitalAnswer(button.dataset.quizAnswer);});});
@@ -615,21 +649,27 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   function startQuizQuestion(){
     clearQuizMarks();
     quiz.current=quiz.questions[quiz.index];
-    quiz.attempts=3;quiz.answered=false;quiz.feedback="";quiz.feedbackType="";quiz.lastWrongId=null;
+    quiz.attempts=3;quiz.answered=false;quiz.autoAdvance=false;quiz.feedback="";quiz.feedbackType="";quiz.lastWrongId=null;
     if(quiz.kind==="capital"){
       var alternatives=shuffle(quizPool.filter(function(c){return c.i!==quiz.current.i;})).slice(0,3);
       quiz.options=shuffle([quiz.current].concat(alternatives));
     }else quiz.options=[];
-    if(quiz.current.z)centerBox(quiz.current.z,Math.max(quiz.current.z[2],quiz.current.z[3])*.35+40);
+    focusQuizArea();
     renderQuizQuestion();
   }
   function resolveQuiz(correct){
     var points=correct?quiz.attempts:0;
     quiz.score+=points;quiz.answered=true;
     quiz.results.push({name:quiz.current.s,points:points});
-    if(correct){markQuizTarget();quiz.feedback="Rätt! "+points+" poäng.";quiz.feedbackType="good";}
+    if(correct){
+      markQuizTarget();quiz.feedback="Rätt! "+points+" poäng.";quiz.feedbackType="good";quiz.autoAdvance=true;
+    }
     else{markQuizTarget();quiz.feedback="Rätt svar: "+quiz.current.s+". 0 poäng.";quiz.feedbackType="bad";}
     renderQuizQuestion();
+    if(correct){
+      var run=quiz.run;
+      setTimeout(function(){if(quiz.active&&quiz.answered&&quiz.run===run)nextQuizQuestion();},350);
+    }
   }
   function handleQuizMapClick(id){
     if(!quiz.active||quiz.answered)return;
@@ -659,8 +699,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   function startQuiz(){
     quiz.kind=document.getElementById("quizKind").value;
     quiz.length=document.getElementById("quizLength").value;
+    quiz.region=document.getElementById("quizRegion").value;
+    quizPool=allQuizPool.filter(function(c){return !quiz.region||part(c)===quiz.region;});
+    if(!quizPool.length)return;
+    quiz.regionBox=boxForCountries(quizPool);
     var amount=quiz.length==="all"?quizPool.length:Math.min(Number(quiz.length),quizPool.length);
-    quiz.questions=shuffle(quizPool).slice(0,amount);quiz.index=0;quiz.score=0;quiz.results=[];quiz.active=true;quiz.finished=false;
+    quiz.questions=shuffle(quizPool).slice(0,amount);quiz.index=0;quiz.score=0;quiz.results=[];quiz.active=true;quiz.finished=false;quiz.run++;
     document.getElementById("startQuiz").textContent="Starta om quiz";
     startQuizQuestion();
   }
@@ -684,7 +728,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     document.getElementById("practiceTray").hidden=!practice;
     document.getElementById("quizSetup").hidden=practice;
     if(practice){
-      quiz.active=false;quiz.finished=false;clearQuizMarks();clearPracticeSelection();showList();
+      quiz.active=false;quiz.finished=false;quiz.run++;clearQuizMarks();clearPracticeSelection();showList();
     }else{
       clearPracticeSelection();
       if(!quiz.active&&!quiz.finished)renderQuizIntro();

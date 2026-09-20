@@ -296,7 +296,7 @@
 
     .game-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 18px;
     }
 
@@ -372,6 +372,24 @@
       border-radius: 50%;
       border-color: rgb(162 112 26 / 30%);
       transform: rotate(-14deg);
+    }
+
+    .sweden-visual::before {
+      width: 210px;
+      height: 210px;
+      top: -115px;
+      left: 16px;
+      border-color: rgb(47 125 115 / 25%);
+    }
+
+    .sweden-visual::after {
+      width: 230px;
+      height: 74px;
+      right: -35px;
+      bottom: -30px;
+      border-radius: 50%;
+      border-color: rgb(162 112 26 / 32%);
+      transform: rotate(17deg);
     }
 
     .visual-icon {
@@ -558,6 +576,12 @@
       }
     }
 
+    @media (min-width: 761px) and (max-width: 980px) {
+      .game-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *,
       *::before,
@@ -609,7 +633,7 @@
       <section class="games" aria-labelledby="games-title">
         <div class="section-heading">
           <h2 id="games-title">Välj ett spel</h2>
-          <p>Två spel finns redo att utforskas just nu.</p>
+          <p>Tre spel finns redo att utforskas just nu.</p>
         </div>
 
         <div class="game-grid">
@@ -651,6 +675,28 @@
                 <div class="card-meta">
                   <span>96 områden</span>
                   <span>Göteborg</span>
+                </div>
+                <span class="play">Spela</span>
+              </div>
+            </div>
+          </a>
+
+          <a class="game-card" href="sveriges-kommuner.html">
+            <div class="card-visual sweden-visual">
+              <svg class="visual-icon" viewBox="0 0 126 100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                <path class="fill" d="M58 10l13 8 4 13 10 9-6 12 8 14-9 18-13 7-11-10-8-1-4-17-10-7 5-15-3-12 11-8z"/>
+                <path d="M58 10l13 8 4 13 10 9-6 12 8 14-9 18-13 7-11-10-8-1-4-17-10-7 5-15-3-12 11-8M47 29l22 2M43 49l31 3M39 67l32 4M57 11l-5 77M72 19l-8 70"/>
+                <circle cx="71" cy="31" r="3" class="fill"/>
+              </svg>
+            </div>
+            <div class="card-body">
+              <div class="card-kicker">Spel 03 · Sverige</div>
+              <h3>Sveriges kommuner</h3>
+              <p>Utforska alla 290 kommuner och sortera dem efter Norr, Syd, Öst, Väst eller kust och landgräns.</p>
+              <div class="card-footer">
+                <div class="card-meta">
+                  <span>290 kommuner</span>
+                  <span>Kust &amp; regioner</span>
                 </div>
                 <span class="play">Spela</span>
               </div>

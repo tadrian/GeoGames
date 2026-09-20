@@ -58,6 +58,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .ctry.territory{fill:var(--land);opacity:.95}
 @media (hover:hover){ .ctry:hover{fill:var(--land-hi)} }
 .ctry.on{fill:var(--gold-soft);stroke:var(--gold);stroke-width:1.6}
+.ctry.quiz-target{fill:var(--gold-soft);stroke:var(--gold);stroke-width:2.2}
+.ctry.quiz-wrong{fill:#d98b78;stroke:#a64d43;stroke-width:1.8}
+.hit.quiz-target{fill:var(--gold-soft);stroke:var(--gold);stroke-width:5;opacity:1}
+.hit.quiz-wrong{fill:#d98b78;stroke:#a64d43;stroke-width:4;opacity:1}
 #dots{fill:none;stroke:var(--border);stroke-width:2.6;stroke-linecap:round;opacity:0}
 #ptout{fill:none;stroke:var(--border);stroke-width:8;stroke-linecap:round}
 #ptin{fill:none;stroke:var(--land);stroke-width:4.5;stroke-linecap:round}
@@ -109,6 +113,19 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .search input::placeholder{color:var(--tx-dim)}
 .search button{border:1px solid var(--rule);border-radius:2px;padding:0 12px;font-size:13px;font-weight:500}
 
+.mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px 14px 8px;border-bottom:1px solid var(--rule)}
+.mode-switch button{border:1px solid var(--rule);border-radius:2px;padding:7px 9px;color:var(--tx-dim);font-size:13px;font-weight:500}
+.mode-switch button[aria-selected=true]{background:var(--tx);border-color:var(--tx);color:var(--panel)}
+.quiz-setup{padding:10px 14px 12px;border-bottom:1px solid var(--rule);background:var(--panel-2)}
+.quiz-setup[hidden],.tray[hidden]{display:none}
+.quiz-title{font-family:var(--serif);font-size:20px;line-height:1.1;margin-bottom:8px}
+.quiz-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px}
+.quiz-fields label{display:flex;flex-direction:column;gap:4px;color:var(--tx-dim);font-size:11px}
+.quiz-fields select{width:100%;background:var(--panel);border:1px solid var(--rule);border-radius:2px;padding:7px 8px;color:inherit;font:inherit;font-size:13px}
+.quiz-start{width:100%;border:1px solid var(--gold);border-radius:2px;background:var(--gold);color:#fff;padding:8px 10px;font-size:13px;font-weight:600}
+.quiz-start:hover{background:var(--gold-soft);color:var(--tx)}
+.quiz-help{margin:8px 0 0;color:var(--tx-dim);font-size:11px;line-height:1.35}
+
 .count{padding:0 14px 8px;font-size:12px;color:var(--tx-dim);letter-spacing:.02em;flex:none}
 .list{list-style:none;margin:0;padding:0 0 18px}
 .list li button{display:flex;width:100%;gap:10px;align-items:baseline;text-align:left;
@@ -118,6 +135,31 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .nm{font-weight:500}
 .cp{margin-left:auto;font-size:13px;color:var(--tx-dim);text-align:right}
 .empty{padding:22px 14px;color:var(--tx-dim)}
+
+.quiz-card{padding:15px 14px 26px}
+.quiz-card h2{font-family:var(--serif);font-size:28px;line-height:1.08;font-weight:400;margin:0 0 7px}
+.quiz-kicker{margin:0 0 6px;color:var(--gold);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.quiz-intro{color:var(--tx-dim);font-size:14px;margin:0 0 16px}
+.quiz-rules{margin:0 0 17px;padding-left:19px;color:var(--tx-dim);font-size:13px}
+.quiz-progress{display:flex;justify-content:space-between;gap:8px;color:var(--tx-dim);font-size:12px;margin-bottom:13px}
+.quiz-question{font-family:var(--serif);font-size:26px;line-height:1.12;font-weight:400;margin:0 0 7px}
+.quiz-instruction{color:var(--tx-dim);font-size:13px;margin:0 0 13px}
+.quiz-attempts{display:inline-flex;padding:4px 8px;border:1px solid var(--gold);border-radius:2px;color:var(--tx);font-size:12px;margin-bottom:12px}
+.quiz-feedback{min-height:20px;margin:0 0 9px;color:var(--tx-dim);font-size:13px}
+.quiz-feedback.good{color:#3e7b5b;font-weight:600}.quiz-feedback.bad{color:#a64d43;font-weight:600}
+.quiz-answers{display:grid;gap:7px;margin-top:5px}
+.quiz-answer{display:flex;align-items:center;gap:8px;width:100%;padding:9px 10px;border:1px solid var(--rule);border-radius:2px;text-align:left;background:var(--panel-2);font-size:13px}
+.quiz-answer:hover{border-color:var(--gold);background:var(--panel)}
+.quiz-answer.correct{border-color:#4b8a66;background:#dcebdc;color:#245337}
+.quiz-answer.wrong{border-color:#b86555;background:#f0d8d2;color:#81392f}
+.quiz-answer:disabled{cursor:default}
+.quiz-next{width:100%;margin-top:13px;border:1px solid var(--tx);border-radius:2px;background:var(--tx);color:var(--panel);padding:9px 10px;font-size:13px;font-weight:600}
+.quiz-next:hover{background:var(--gold);border-color:var(--gold);color:#fff}
+.quiz-result{padding:4px 0 10px}
+.quiz-result-score{font-family:var(--serif);font-size:34px;margin:7px 0 15px}
+.quiz-result-list{margin:0;padding:0;list-style:none;border-top:1px solid var(--rule)}
+.quiz-result-list li{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--rule);font-size:12px}
+.quiz-result-list strong{font-weight:600}
 
 .tray{flex:none;display:flex;align-items:center;gap:8px;padding:9px 14px;
   border-bottom:1px solid var(--rule);background:var(--panel-2)}
@@ -182,7 +224,32 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
   <aside class="panel">
     <div class="grip"><i></i></div>
-    <div class="tray">
+    <div class="mode-switch" role="tablist" aria-label="Spelläge">
+      <button id="practiceMode" type="button" role="tab" aria-selected="true">Öva</button>
+      <button id="quizMode" type="button" role="tab" aria-selected="false">Quiz</button>
+    </div>
+    <div class="quiz-setup" id="quizSetup" hidden>
+      <div class="quiz-title">Skapa ett quiz</div>
+      <div class="quiz-fields">
+        <label for="quizKind">Frågetyp
+          <select id="quizKind">
+            <option value="country">Länder</option>
+            <option value="capital">Huvudstäder</option>
+          </select>
+        </label>
+        <label for="quizLength">Antal frågor
+          <select id="quizLength">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="all">Alla</option>
+          </select>
+        </label>
+      </div>
+      <button id="startQuiz" class="quiz-start" type="button">Starta quiz</button>
+      <p class="quiz-help">Tre försök per fråga: 3, 2, 1 eller 0 poäng.</p>
+    </div>
+    <div class="tray" id="practiceTray">
       <button id="rndL" class="rndbtn" title="Slumpa ett land" aria-label="Slumpa ett land">🎲</button>
       <select id="reg" aria-label="Världsdel att slumpa i"></select>
       <button id="lock" class="lockbtn" aria-pressed="false"
@@ -387,10 +454,19 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
   /* ---------- selection ---------- */
   var selected = null, selEl = null, lockView = false;
+  var gameMode = "practice";
+  var quiz = {
+    active:false, finished:false, kind:"country", length:"10", questions:[], index:0,
+    score:0, attempts:3, current:null, answered:false, feedback:"", options:[], results:[]
+  };
 
   svg.addEventListener("click", function(e){
     if (moved > 8) return;
     var t = e.target.closest("path.ctry, circle.hit");
+    if (gameMode === "quiz"){
+      if (t) handleQuizMapClick(idOf(t));
+      return;
+    }
     if (!t){ select(null); return; }
     select(idOf(t), false);
   });
@@ -411,6 +487,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   }
 
   function select(id, doZoom){
+    if (gameMode === "quiz") return;
     if (selEl) selEl.classList.remove("on");
     selEl = null; selected = null;
     pin.classList.remove("on"); pinring.classList.remove("on"); pinlbl.classList.remove("on");
@@ -446,6 +523,133 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   }
   function num(n){
     return n == null ? "—" : Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  }
+
+  var quizPool = DATA.countries.filter(function(c){ return c.cap && (c.d || c.hit); });
+
+  function shuffle(list){
+    var copy = list.slice();
+    for (var i=copy.length-1;i>0;i--){
+      var j=Math.floor(Math.random()*(i+1)), item=copy[i];
+      copy[i]=copy[j]; copy[j]=item;
+    }
+    return copy;
+  }
+  function mapElementFor(c){
+    return document.getElementById("c-" + c.i) || svg.querySelector('circle.hit[data-i="' + c.i + '"]');
+  }
+  function clearPracticeSelection(){
+    if(selEl)selEl.classList.remove("on");
+    selEl=null;selected=null;
+    pin.classList.remove("on");pinring.classList.remove("on");pinlbl.classList.remove("on");
+  }
+  function clearQuizMarks(){
+    svg.querySelectorAll(".quiz-target,.quiz-wrong").forEach(function(el){
+      el.classList.remove("quiz-target","quiz-wrong");
+    });
+  }
+  function markQuizTarget(){
+    var el=mapElementFor(quiz.current);
+    if(el)el.classList.add("quiz-target");
+  }
+  function markQuizWrong(id){
+    var c=byId[id],el=c&&mapElementFor(c);
+    if(el)el.classList.add("quiz-wrong");
+  }
+  function quizLengthLabel(){
+    return quiz.length === "all" ? "alla" : quiz.length;
+  }
+  function renderQuizIntro(){
+    pbody.innerHTML='<div class="quiz-card"><p class="quiz-kicker">Quizläge</p><h2>Redo att testa kartkunskaperna?</h2><p class="quiz-intro">Välj frågetyp och antal frågor ovan. Du får tre försök per fråga.</p><ul class="quiz-rules"><li>Första försöket ger 3 poäng.</li><li>Andra försöket ger 2 poäng.</li><li>Tredje försöket ger 1 poäng.</li><li>Efter tre fel visas rätt svar och du får 0 poäng.</li></ul><p class="quiz-intro">Länder besvaras genom klick på kartan. Huvudstäder besvaras med fyra alternativ.</p></div>';
+  }
+  function renderQuizQuestion(){
+    var c=quiz.current,total=quiz.questions.length;
+    if(!c)return;
+    var question=quiz.kind==="country" ? "Hitta " + esc(c.s) : "Vilken är huvudstaden i " + esc(c.s) + "?";
+    var instruction=quiz.kind==="country" ? "Klicka på landet på kartan." : "Välj rätt huvudstad bland alternativen.";
+    var feedbackClass=quiz.feedbackType ? " " + quiz.feedbackType : "";
+    var html='<div class="quiz-card"><div class="quiz-progress"><span>Fråga '+(quiz.index+1)+' av '+total+'</span><strong>'+quiz.score+' poäng</strong></div><p class="quiz-kicker">'+(quiz.kind==="country"?'Länder':'Huvudstäder')+'</p><h2 class="quiz-question">'+question+'</h2><p class="quiz-instruction">'+instruction+'</p><span class="quiz-attempts">Försök kvar: '+quiz.attempts+'</span><p class="quiz-feedback'+feedbackClass+'">'+esc(quiz.feedback||"")+'</p>';
+    if(quiz.kind==="capital"){
+      html+='<div class="quiz-answers">'+quiz.options.map(function(option){
+        var cls="quiz-answer";
+        if(quiz.lastWrongId===option.i)cls+=" wrong";
+        if(quiz.answered && option.i===c.i)cls+=" correct";
+        return '<button type="button" class="'+cls+'" data-quiz-answer="'+esc(option.i)+'"'+(quiz.answered?' disabled':'')+'>'+esc(option.cap)+'</button>';
+      }).join("")+'</div>';
+    }
+    if(quiz.answered)html+='<button type="button" class="quiz-next" id="quizNext">'+(quiz.index+1<total?'Nästa fråga →':'Visa resultat')+'</button>';
+    html+='</div>';
+    pbody.innerHTML=html;
+    if(quiz.kind==="capital")pbody.querySelectorAll("[data-quiz-answer]").forEach(function(button){button.addEventListener("click",function(){handleCapitalAnswer(button.dataset.quizAnswer);});});
+    var next=document.getElementById("quizNext");
+    if(next)next.onclick=function(){nextQuizQuestion();};
+  }
+  function startQuizQuestion(){
+    clearQuizMarks();
+    quiz.current=quiz.questions[quiz.index];
+    quiz.attempts=3;quiz.answered=false;quiz.feedback="";quiz.feedbackType="";quiz.lastWrongId=null;
+    if(quiz.kind==="capital"){
+      var alternatives=shuffle(quizPool.filter(function(c){return c.i!==quiz.current.i;})).slice(0,3);
+      quiz.options=shuffle([quiz.current].concat(alternatives));
+    }else quiz.options=[];
+    if(quiz.current.z)centerBox(quiz.current.z,Math.max(quiz.current.z[2],quiz.current.z[3])*.35+40);
+    renderQuizQuestion();
+  }
+  function resolveQuiz(correct){
+    var points=correct?quiz.attempts:0;
+    quiz.score+=points;quiz.answered=true;
+    quiz.results.push({name:quiz.current.s,points:points});
+    if(correct){markQuizTarget();quiz.feedback="Rätt! "+points+" poäng.";quiz.feedbackType="good";}
+    else{markQuizTarget();quiz.feedback="Rätt svar: "+quiz.current.s+". 0 poäng.";quiz.feedbackType="bad";}
+    renderQuizQuestion();
+  }
+  function handleQuizMapClick(id){
+    if(!quiz.active||quiz.answered)return;
+    if(id===quiz.current.i){resolveQuiz(true);return;}
+    markQuizWrong(id);quiz.attempts--;
+    if(quiz.attempts<=0){resolveQuiz(false);return;}
+    quiz.feedback="Inte rätt — du har "+quiz.attempts+" försök kvar.";quiz.feedbackType="bad";renderQuizQuestion();
+  }
+  function handleCapitalAnswer(id){
+    if(!quiz.active||quiz.answered)return;
+    if(id===quiz.current.i){resolveQuiz(true);return;}
+    quiz.lastWrongId=id;quiz.attempts--;
+    if(quiz.attempts<=0){resolveQuiz(false);return;}
+    quiz.feedback="Inte rätt — du har "+quiz.attempts+" försök kvar.";quiz.feedbackType="bad";renderQuizQuestion();
+  }
+  function nextQuizQuestion(){
+    quiz.index++;
+    if(quiz.index>=quiz.questions.length){finishQuiz();return;}
+    startQuizQuestion();
+  }
+  function finishQuiz(){
+    clearQuizMarks();quiz.active=false;quiz.finished=true;
+    var max=quiz.questions.length*3;
+    var rows=quiz.results.map(function(result,i){return '<li><span><strong>'+(i+1)+'.</strong> '+esc(result.name)+'</span><strong>'+result.points+' p</strong></li>';}).join("");
+    pbody.innerHTML='<div class="quiz-card quiz-result"><p class="quiz-kicker">Quiz klart</p><h2>Bra jobbat!</h2><div class="quiz-result-score">'+quiz.score+' / '+max+' poäng</div><p class="quiz-intro">Du klarade '+quiz.questions.length+' '+(quiz.questions.length===1?'fråga':'frågor')+'. Startknappen ovan skapar ett nytt quiz med dina val.</p><ul class="quiz-result-list">'+rows+'</ul></div>';
+  }
+  function startQuiz(){
+    quiz.kind=document.getElementById("quizKind").value;
+    quiz.length=document.getElementById("quizLength").value;
+    var amount=quiz.length==="all"?quizPool.length:Math.min(Number(quiz.length),quizPool.length);
+    quiz.questions=shuffle(quizPool).slice(0,amount);quiz.index=0;quiz.score=0;quiz.results=[];quiz.active=true;quiz.finished=false;
+    document.getElementById("startQuiz").textContent="Starta om quiz";
+    startQuizQuestion();
+  }
+  function setMode(mode){
+    gameMode=mode;
+    var practice=mode==="practice";
+    document.getElementById("practiceMode").setAttribute("aria-selected",practice?"true":"false");
+    document.getElementById("quizMode").setAttribute("aria-selected",practice?"false":"true");
+    document.getElementById("practiceTray").hidden=!practice;
+    document.getElementById("quizSetup").hidden=practice;
+    if(practice){
+      quiz.active=false;quiz.finished=false;clearQuizMarks();clearPracticeSelection();showList();
+    }else{
+      clearPracticeSelection();
+      if(!quiz.active&&!quiz.finished)renderQuizIntro();
+      else if(quiz.finished)finishQuiz();
+    }
   }
 
   function showList(){
@@ -562,6 +766,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       ? "Vyn är låst — kartan flyttar sig inte vid val"
       : "Lås vyn — behåll nuvarande utsnitt vid slump";
   };
+
+  document.getElementById("practiceMode").onclick = function(){setMode("practice");};
+  document.getElementById("quizMode").onclick = function(){setMode("quiz");};
+  document.getElementById("startQuiz").onclick = startQuiz;
 
   showList();
   draw();

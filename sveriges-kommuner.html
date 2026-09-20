@@ -249,11 +249,15 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     }
     animation=requestAnimationFrame(step);
   }
-  function fitBox(box,animate){
-    homeBox=box;var r=stage.getBoundingClientRect();if(!(r.width>0&&r.height>0))return;
+  function fitBox(box,animate,remember){
+    if(remember!==false)homeBox=box;var r=stage.getBoundingClientRect();if(!(r.width>0&&r.height>0))return;
     var ar=r.width/r.height,x=box[0],y=box[1],w=box[2],h=box[3];
     if(w/h>ar){var nh=w/ar;y-=(nh-h)/2;h=nh;}else{var nw=h*ar;x-=(nw-w)/2;w=nw;}
     setView({x:x,y:y,w:w,h:h},animate);
+  }
+  function boxWithPadding(box){
+    var pad=Math.max(.04,Math.max(box[2],box[3])*.45);
+    return [box[0]-pad,box[1]-pad,box[2]+pad*2,box[3]+pad*2];
   }
   function apply(){svg.setAttribute("viewBox",view.x+" "+view.y+" "+view.w+" "+view.h);}
   function zoomAt(px,py,factor){
@@ -268,8 +272,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     selected=null;
     if(!code){showList();return;}
     var m=byCode[code];if(!m)return;
-    selected=m;m.el.classList.add("sel");svg.appendChild(m.el);
-    if(doZoom&&!locked)fitBox([m.b[0],m.b[1],m.b[2],m.b[3]],true);
+    selected=m;m.el.classList.add("sel");document.getElementById("sweden").appendChild(m.el);
+    if(doZoom&&!locked)fitBox(boxWithPadding(m.b),true,false);
     showDetail(m);markList();
   }
   function renderList(){

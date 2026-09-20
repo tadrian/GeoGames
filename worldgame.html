@@ -62,9 +62,13 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .ctry.quiz-wrong{fill:#d98b78;stroke:#a64d43;stroke-width:1.8}
 .hit.quiz-target{fill:var(--gold-soft);stroke:var(--gold);stroke-width:5;opacity:1}
 .hit.quiz-wrong{fill:#d98b78;stroke:#a64d43;stroke-width:4;opacity:1}
+#map.quiz-mode .ctry:hover{fill:var(--land)}
+#map.quiz-mode .ctry.quiz-target:hover{fill:var(--gold-soft)}
+#map.quiz-mode .ctry.quiz-wrong:hover{fill:#d98b78}
 #dots{fill:none;stroke:var(--border);stroke-width:2.6;stroke-linecap:round;opacity:0}
 #ptout{fill:none;stroke:var(--border);stroke-width:8;stroke-linecap:round}
 #ptin{fill:none;stroke:var(--land);stroke-width:4.5;stroke-linecap:round}
+#dots,#ptout,#ptin,#pin,#pinring,#pinlbl{pointer-events:none}
 .z2 #dots{opacity:.75}
 #pin{fill:none;stroke:var(--gold);stroke-width:8;stroke-linecap:round;display:none}
 #pin.on{display:block}
@@ -408,7 +412,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   // pointer drag + pinch
   var pts = new Map(), last = null, moved = 0, pinchD = 0;
   svg.addEventListener("pointerdown", function(e){
-    svg.setPointerCapture(e.pointerId);
+    if (gameMode !== "quiz") svg.setPointerCapture(e.pointerId);
     pts.set(e.pointerId, {x:e.clientX, y:e.clientY});
     moved = 0;
     if (pts.size === 1){ last = {x:e.clientX, y:e.clientY}; svg.classList.add("drag"); }
@@ -432,7 +436,18 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   function endPtr(e){
     pts.delete(e.pointerId);
     if (pts.size < 2) pinchD = 0;
-    if (pts.size === 0){ last = null; svg.classList.remove("drag"); }
+    if (pts.size === 0){
+      last = null; svg.classList.remove("drag");
+      if (gameMode === "quiz" && moved < 8){
+        var under=document.elementFromPoint(e.clientX,e.clientY);
+        var target=under && under.closest ? under.closest("path.ctry, circle.hit") : null;
+        if(target){
+          quizPointerClickHandled=true;
+          handleQuizMapClick(idOf(target));
+          setTimeout(function(){quizPointerClickHandled=false;},0);
+        }
+      }
+    }
     else { var f = pts.values().next().value; last = {x:f.x, y:f.y}; }
   }
   svg.addEventListener("pointerup", endPtr);
@@ -455,15 +470,24 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   /* ---------- selection ---------- */
   var selected = null, selEl = null, lockView = false;
   var gameMode = "practice";
+  var quizPointerClickHandled = false;
   var quiz = {
     active:false, finished:false, kind:"country", length:"10", questions:[], index:0,
     score:0, attempts:3, current:null, answered:false, feedback:"", options:[], results:[]
   };
 
   svg.addEventListener("click", function(e){
-    if (moved > 8) return;
+    if (gameMode !== "quiz" && moved > 8) return;
     var t = e.target.closest("path.ctry, circle.hit");
+    if (!t && typeof e.clientX === "number"){
+      var under = document.elementFromPoint(e.clientX,e.clientY);
+      t = under && under.closest ? under.closest("path.ctry, circle.hit") : null;
+    }
     if (gameMode === "quiz"){
+      if (quizPointerClickHandled){
+        quizPointerClickHandled=false;
+        return;
+      }
       if (t) handleQuizMapClick(idOf(t));
       return;
     }
@@ -473,6 +497,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
   var readout = document.getElementById("readout");
   svg.addEventListener("pointerover", function(e){
+    if (gameMode === "quiz"){
+      readout.classList.remove("on");
+      return;
+    }
     var t = e.target.closest("path.ctry, circle.hit");
     if (!t){ readout.classList.remove("on"); return; }
     var c = byId[idOf(t)];
@@ -639,6 +667,18 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   function setMode(mode){
     gameMode=mode;
     var practice=mode==="practice";
+    svg.classList.toggle("quiz-mode",!practice);
+    readout.classList.remove("on");
+    svg.querySelectorAll("path.ctry, circle.hit").forEach(function(el){
+      var title=el.querySelector("title");
+      if(!title)return;
+      if(!practice){
+        if(!title.dataset.quizTitle)title.dataset.quizTitle=title.textContent;
+        title.textContent="";
+      }else if(title.dataset.quizTitle){
+        title.textContent=title.dataset.quizTitle;
+      }
+    });
     document.getElementById("practiceMode").setAttribute("aria-selected",practice?"true":"false");
     document.getElementById("quizMode").setAttribute("aria-selected",practice?"false":"true");
     document.getElementById("practiceTray").hidden=!practice;

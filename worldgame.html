@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Världskartan — FN:s medlems- och observatörsstater</title>
+<title>Världskartan — länder och områden</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&display=swap" rel="stylesheet">
@@ -55,6 +55,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 #world path{vector-effect:non-scaling-stroke}
 .terr{fill:var(--land-dim);stroke:var(--border);stroke-width:.5;opacity:.85}
 .ctry{fill:var(--land);stroke:var(--border);stroke-width:.7}
+.ctry.territory{fill:var(--land);opacity:.95}
 @media (hover:hover){ .ctry:hover{fill:var(--land-hi)} }
 .ctry.on{fill:var(--gold-soft);stroke:var(--gold);stroke-width:1.6}
 #dots{fill:none;stroke:var(--border);stroke-width:2.6;stroke-linecap:round;opacity:0}
@@ -79,7 +80,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   padding:10px 12px;pointer-events:none}
 .brand{font-family:var(--serif);font-size:17px;letter-spacing:.01em;
   background:var(--panel);border:1px solid var(--rule);border-radius:2px;
-  padding:3px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  padding:3px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  color:var(--tx);text-decoration:none;pointer-events:auto;transition:border-color .12s,color .12s}
+.brand:hover{border-color:var(--gold);color:var(--gold)}
 .readout{margin-left:auto;font-size:13px;font-weight:500;background:var(--panel);
   border:1px solid var(--rule);border-radius:2px;padding:4px 10px;opacity:0;
   transition:opacity .12s;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -164,9 +167,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 <body>
 <div class="app">
   <main class="stage" id="stage">
-    <svg id="map" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Världskarta över FN:s medlems- och observatörsstater"></svg>
+    <svg id="map" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Världskarta över länder och områden"></svg>
     <div class="hud">
-      <div class="brand">Världen i 195 stater</div>
+      <a class="brand" href="index.html" aria-label="Tillbaka till spelmenyn">← Spelmeny · Världskartan</a>
       <div class="readout" id="readout"></div>
     </div>
     <div class="scalebar" id="scalebar">1×</div>
@@ -196,8 +199,41 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   "use strict";
   var SVGNS = "http://www.w3.org/2000/svg";
   var VB = DATA.view, VW = VB[2], VH = VB[3];
+  function bboxFromPath(d){
+    var nums = (d.match(/-?\d+(?:\.\d+)?/g) || []).map(Number);
+    var xs = [], ys = [];
+    for (var i = 0; i + 1 < nums.length; i += 2){
+      xs.push(nums[i]); ys.push(nums[i + 1]);
+    }
+    if (!xs.length) return [0, 0, 1, 1];
+    var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs);
+    var y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+    return [x0, y0, Math.max(1, x1 - x0), Math.max(1, y1 - y0)];
+  }
+  var TERRITORY_META = {
+    "Kosovo": {i:"XKX", n:"Kosovo", s:"Kosovo", o:"Republiken Kosovo", cap:"Pristina", r:"Europa", sr:"Sydösteuropa", fl:"🇽🇰", cc:"XK", kind:"Omstritt område"},
+    "Greenland": {i:"GRL", n:"Greenland", s:"Grönland", o:"Självstyrande del av Kungariket Danmark", cap:"Nuuk", r:"Amerika", sr:"Nordamerika", fl:"🇬🇱", cc:"GL", kind:"Självstyrande område"},
+    "Taiwan": {i:"TWN", n:"Taiwan", s:"Taiwan", o:"Taiwan", cap:"Taipei", r:"Asien", sr:"Östasien", fl:"🇹🇼", cc:"TW", kind:"Omstritt område"},
+    "W. Sahara": {i:"ESH", n:"Western Sahara", s:"Västsahara", o:"Västsahara", cap:"El Aaiún", r:"Afrika", sr:"Nordafrika", fl:"🇪🇭", cc:"EH", kind:"Omstritt område"},
+    "N. Cyprus": {i:"CYN", n:"Northern Cyprus", s:"Nordcypern", o:"Turkiska republiken Nordcypern", cap:"Nicosia", r:"Europa", sr:"Östra Medelhavet", fl:"", cc:"", kind:"Omstritt område"},
+    "Somaliland": {i:"SML", n:"Somaliland", s:"Somaliland", o:"Somaliland", cap:"Hargeisa", r:"Afrika", sr:"Östafrika", fl:"", cc:"", kind:"Omstritt område"},
+    "Cook Is.": {i:"COK", n:"Cook Islands", s:"Cooköarna", o:"Cooköarna", cap:"Avarua", r:"Oceanien", sr:"Polynesien", fl:"🇨🇰", cc:"CK", kind:"Självstyrande område"},
+    "Niue": {i:"NIU", n:"Niue", s:"Niue", o:"Niue", cap:"Alofi", r:"Oceanien", sr:"Polynesien", fl:"🇳🇺", cc:"NU", kind:"Självstyrande område"}
+  };
+  var territoryCountries = DATA.territories.map(function(t, index){
+    var box = bboxFromPath(t.d);
+    return Object.assign({
+      i:"T" + String(index + 1).padStart(2, "0"), n:t.n, s:t.n,
+      o:"Övrigt kartområde", cap:"—", r:"Övriga", sr:"", a:null,
+      fl:"🌐", cc:"", tel:"", cur:"", lng:"", bd:[], ob:0,
+      nt:"", d:t.d, z:box, territory:true
+    }, TERRITORY_META[t.n] || {}, {d:t.d, z:box, territory:true});
+  });
+  var countries = DATA.countries.concat(territoryCountries);
+  var memberCount = DATA.countries.filter(function(c){ return !c.ob; }).length;
+  var observerCount = DATA.countries.filter(function(c){ return c.ob; }).length;
   var byId = {};
-  DATA.countries.forEach(function(c){ byId[c.i] = c; });
+  countries.forEach(function(c){ byId[c.i] = c; });
 
   /* ---------- build the map ---------- */
   var svg = document.getElementById("map");
@@ -205,23 +241,20 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
 
   var parts = ['<g id="world">'];
-  DATA.territories.forEach(function(t){
-    parts.push('<path class="terr" d="' + t.d + '"><title>' + esc(t.n) + ' — ej FN-medlem</title></path>');
-  });
-  DATA.countries.forEach(function(c){
+  countries.forEach(function(c){
     if (!c.d) return;
-    parts.push('<path class="ctry' + (c.ob ? " obs" : "") + '" id="c-' + c.i + '" d="' + c.d +
-      '"><title>' + esc(c.s) + ' — ' + esc(c.cap) + (c.ob ? ' (observatörsstat)' : '') + '</title></path>');
+    parts.push('<path class="ctry' + (c.ob ? " obs" : "") + (c.territory ? " territory" : "") + '" id="c-' + c.i + '" d="' + c.d +
+      '"><title>' + esc(c.s) + ' — ' + esc(c.cap) + (c.territory ? ' (övrigt kartområde)' : (c.ob ? ' (observatörsstat)' : '')) + '</title></path>');
   });
-  DATA.countries.forEach(function(c){
+  countries.forEach(function(c){
     if (!c.hit) return;
     parts.push('<circle class="hit" cx="' + c.hit[0] + '" cy="' + c.hit[1] + '" r="' + (c.pt ? 22 : 11) +
       '" data-i="' + c.i + '"><title>' + esc(c.s) + ' — ' + esc(c.cap) + (c.ob ? ' (observatörsstat)' : '') + '</title></circle>');
   });
-  var dots = DATA.countries.filter(function(c){ return c.cp; })
+  var dots = countries.filter(function(c){ return c.cp && !c.territory; })
     .map(function(c){ return "M" + c.cp[0] + " " + c.cp[1] + "l0 0"; }).join("");
   parts.push('<path id="dots" d="' + dots + '"></path>');
-  var ptd = DATA.countries.filter(function(c){ return c.pt; })
+  var ptd = countries.filter(function(c){ return c.pt; })
     .map(function(c){ return "M" + c.pt[0] + " " + c.pt[1] + "l0 0"; }).join("");
   parts.push('<path id="ptout" d="' + ptd + '"></path>');
   parts.push('<path id="ptin" d="' + ptd + '"></path>');
@@ -368,7 +401,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     if (!t){ readout.classList.remove("on"); return; }
     var c = byId[idOf(t)];
     if (!c) return;
-    readout.textContent = c.s + " — huvudstad " + c.cap + (c.ob ? " (observatörsstat)" : "");
+    readout.textContent = c.s + (c.cap !== "—" ? " — huvudstad " + c.cap : " — övrigt kartområde") + (c.ob ? " (observatörsstat)" : "");
     readout.classList.add("on");
   });
   svg.addEventListener("pointerleave", function(){ readout.classList.remove("on"); });
@@ -417,7 +450,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
   function showList(){
     var q = norm(query.trim());
-    var rows = DATA.countries.filter(function(c){
+    var rows = countries.filter(function(c){
       if (!q) return true;
       return norm(c.s).indexOf(q) > -1 || norm(c.n).indexOf(q) > -1 ||
              norm(c.cap).indexOf(q) > -1 || norm(c.o).indexOf(q) > -1 ||
@@ -426,14 +459,14 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     var html = '<div class="search">' +
       '<input id="q" type="search" placeholder="Sök land eller huvudstad" value="' + esc(query) + '" autocomplete="off" spellcheck="false"></div>' +
       '<div class="count">' + (q ? rows.length + " träffar"
-        : "193 medlemsstater och 2 observatörsstater. Tryck på ett land i listan eller på kartan.") + "</div>";
+        : memberCount + " medlemsstater, " + observerCount + " observatörsstater och " + territoryCountries.length + " övriga kartområden. Tryck på ett land eller område i listan eller på kartan.") + "</div>";
     if (!rows.length){
       html += '<p class="empty">Inga träffar på ”' + esc(query) + '”.</p>';
     } else {
       html += '<ul class="list">' + rows.map(function(c){
         return '<li><button data-i="' + c.i + '"><span class="flag">' + c.fl + '</span>' +
                '<span class="nm">' + esc(c.s) + "</span>" +
-               (c.ob ? '<span class="tag">OBS</span>' : "") +
+               (c.territory ? '<span class="tag">ÖVRIGT</span>' : (c.ob ? '<span class="tag">OBS</span>' : "")) +
                '<span class="cp">' + esc(c.cap) + "</span></button></li>";
       }).join("") + "</ul>";
     }
@@ -466,7 +499,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
         (c.cur ? "<dt>Valuta</dt><dd>" + esc(c.cur) + "</dd>" : "") +
         (c.lng ? "<dt>Språk</dt><dd>" + esc(c.lng) + "</dd>" : "") +
         (c.tel ? "<dt>Landsnummer</dt><dd>" + esc(c.tel) + "</dd>" : "") +
-        "<dt>ISO-kod</dt><dd>" + c.cc + " · " + c.i + "</dd>" +
+        (c.cc ? "<dt>ISO-kod</dt><dd>" + c.cc + " · " + c.i + "</dd>" : "<dt>Kartkod</dt><dd>" + c.i + "</dd>") +
         "<dt>Engelskt namn</dt><dd>" + esc(c.n) + "</dd>" +
       "</dl>";
     if (nb.length){
@@ -476,10 +509,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     } else {
       html += '<div class="nb"><h3>Landgränser</h3><div class="chips"><span style="color:var(--tx-dim);font-size:13px">Inga — ö eller enklav utan landgräns.</span></div></div>';
     }
-    html += '<p class="note">Kartan visar FN:s 193 medlemsstater plus de två observatörsstaterna ' +
-      'Palestina och Vatikanstaten, som har streckad gräns. Grå ytor är territorier, självstyrande ' +
-      'områden och stater utanför FN. Antarktis är utelämnat. Projektion: Equal Earth — ytriktig, ' +
-      'så länders storlek går att jämföra direkt. Gränsdata: Natural Earth 1:50 m.</p></div>';
+    html += '<p class="note">' + (c.territory
+      ? esc(c.kind || "Övrigt kartområde") + ' — visas här som en valbar del av världskartan. Uppgifterna kan skilja sig från en självständig stat och området är inte med i FN:s medlemsantal.'
+      : 'Kartan visar FN:s 193 medlemsstater plus de två observatörsstaterna Palestina och Vatikanstaten, som har streckad gräns. Övriga länder och kartområden är också valbara. Antarktis är utelämnat. Projektion: Equal Earth — ytriktig, så länders storlek går att jämföra direkt. Gränsdata: Natural Earth 1:50 m.') + '</p></div>';
     pbody.innerHTML = html;
     pbody.scrollTop = 0;
     document.getElementById("back").onclick = function(){ select(null); };
@@ -499,17 +531,18 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     if (c.r !== "Amerika") return c.r;
     return c.sr === "Sydamerika" ? "Sydamerika" : "Nordamerika";
   }
-  var ORDER = ["Afrika", "Asien", "Europa", "Nordamerika", "Oceanien", "Sydamerika"];
+  var ORDER = ["Afrika", "Asien", "Europa", "Nordamerika", "Oceanien", "Sydamerika", "Övriga"];
   var reg = document.getElementById("reg");
-  reg.innerHTML = '<option value="">Alla världsdelar (' + DATA.countries.length + ")</option>" +
+  reg.innerHTML = '<option value="">Alla länder och områden (' + countries.length + ")</option>" +
     ORDER.map(function(w){
-      var n = DATA.countries.filter(function(c){ return part(c) === w; }).length;
-      return n ? '<option value="' + w + '">' + w + " (" + n + ")</option>" : "";
+      var n = countries.filter(function(c){ return part(c) === w; }).length;
+      var label = w === "Övriga" ? "Övriga områden" : w;
+      return n ? '<option value="' + w + '">' + label + " (" + n + ")</option>" : "";
     }).join("");
 
   function roll(){
     var w = reg.value;
-    var pool = DATA.countries.filter(function(c){ return !w || part(c) === w; });
+    var pool = countries.filter(function(c){ return !w || part(c) === w; });
     if (pool.length > 1 && selected){
       pool = pool.filter(function(c){ return c.i !== selected.i; });
     }

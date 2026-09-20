@@ -129,6 +129,12 @@ path.o.sel{fill:var(--brass);stroke:var(--brass);stroke-width:2px;filter:saturat
   background:var(--panel);border-right:1px solid var(--line)
 }
 .head{padding:18px 18px 12px}
+.menu-link{
+  display:inline-flex;align-items:center;gap:5px;margin-bottom:12px;
+  color:var(--mute);font-size:13px;font-weight:600;text-decoration:none
+}
+.menu-link:hover{color:var(--patina)}
+.menu-link:focus-visible{outline:2px solid var(--brass);outline-offset:3px}
 .head h1{
   margin:0;font-family:"Bricolage Grotesque",sans-serif;font-weight:700;
   font-size:26px;line-height:1.05;letter-spacing:-.025em
@@ -221,6 +227,7 @@ input[type=search]:focus{outline:2px solid var(--brass);outline-offset:-1px;bord
 
   <aside class="panel">
     <div class="head">
+      <a class="menu-link" href="index.html" aria-label="Tillbaka till spelmenyn">← Till spelmenyn</a>
       <h1>Göteborgs primärområden</h1>
       <p id="count">96 områden</p>
     </div>

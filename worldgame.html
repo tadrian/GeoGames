@@ -184,7 +184,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .detail{padding:0 14px 26px}
 .back{font-size:13px;font-weight:500;color:var(--tx-dim);padding:2px 0 12px}
 .dhead{display:flex;gap:12px;align-items:flex-start}
-.dflag{font-size:34px;line-height:1}
+.dflag{font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif;font-size:38px;line-height:1}
+.detail-flag{font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif;font-size:25px;line-height:1}
 .dname{font-family:var(--serif);font-size:30px;line-height:1.1;font-weight:400;margin:0}
 .dofficial{font-family:var(--serif);font-style:italic;font-weight:300;color:var(--tx-dim);
   font-size:15px;margin:2px 0 0}
@@ -777,7 +778,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     var nb = (c.bd || []).map(function(x){ return byId[x]; }).filter(Boolean);
     var html = '<div class="detail">' +
       '<button class="back" id="back">← Alla länder</button>' +
-      '<div class="dhead"><span class="dflag">' + c.fl + "</span><div>" +
+      '<div class="dhead"><span class="dflag" role="img" aria-label="Flagga för ' + esc(c.s) + '">' + (c.fl || "🌐") + "</span><div>" +
         '<h2 class="dname">' + esc(c.s) + "</h2>" +
         '<p class="dofficial">' + esc(c.o) + "</p></div></div>" +
       (c.ob ? '<p class="obsline"><strong>Observatörsstat i FN</strong> — inte medlemsstat. ' +
@@ -790,7 +791,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
         (c.cur ? "<dt>Valuta</dt><dd>" + esc(c.cur) + "</dd>" : "") +
         (c.lng ? "<dt>Språk</dt><dd>" + esc(c.lng) + "</dd>" : "") +
         (c.tel ? "<dt>Landsnummer</dt><dd>" + esc(c.tel) + "</dd>" : "") +
-        (c.cc ? "<dt>ISO-kod</dt><dd>" + c.cc + " · " + c.i + "</dd>" : "<dt>Kartkod</dt><dd>" + c.i + "</dd>") +
+        "<dt>Flagga</dt><dd><span class=\"detail-flag\" role=\"img\" aria-label=\"Flagga för " + esc(c.s) + "\">" + (c.fl || "🌐") + "</span></dd>" +
         "<dt>Engelskt namn</dt><dd>" + esc(c.n) + "</dd>" +
       "</dl>";
     if (nb.length){

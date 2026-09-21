@@ -50,8 +50,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
 /* ---------- map ---------- */
 .stage{position:relative;flex:1;min-height:0;background:var(--sea);touch-action:none;overflow:hidden}
-#map{display:block;width:100%;height:100%;cursor:default;touch-action:none}
-#map.drag{cursor:default}
+#map{display:block;width:100%;height:100%;cursor:grab;touch-action:none}
+#map.drag{cursor:grabbing}
 #world path{vector-effect:non-scaling-stroke}
 .terr{fill:var(--land-dim);stroke:var(--border);stroke-width:.5;opacity:.85}
 .ctry{fill:var(--land);stroke:var(--border);stroke-width:.7;cursor:default}
@@ -77,7 +77,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 #pinlbl{display:none;font-family:var(--sans);font-weight:600;fill:var(--tx);
   paint-order:stroke;stroke:var(--sea);stroke-width:3px;stroke-linejoin:round}
 .z2 #pinlbl.on{display:block}
-.hit{fill:transparent;stroke:none;cursor:default}
+.hit{fill:var(--gold-soft);fill-opacity:.9;stroke:var(--sea);stroke-width:4;paint-order:stroke;cursor:pointer;opacity:.92}
+@media (hover:hover){.hit:hover{fill:var(--gold);stroke:var(--tx);opacity:1}}
+.hit.on{fill:var(--gold);stroke:var(--tx);opacity:1}
 .ctry.obs{stroke-dasharray:4 2.5}
 .tag{font-size:10px;font-weight:600;letter-spacing:.06em;color:var(--gold);
   border:1px solid var(--gold);border-radius:2px;padding:1px 4px;flex:none;align-self:center}
@@ -103,6 +105,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .zoomer button:active{background:var(--panel-2)}
 .scalebar{position:absolute;left:12px;bottom:14px;font-size:11px;color:var(--tx-dim);
   pointer-events:none;letter-spacing:.02em}
+.markerhint{position:absolute;left:12px;bottom:32px;display:flex;align-items:center;gap:5px;
+  color:var(--tx-dim);font-size:11px;pointer-events:none;letter-spacing:.01em}
+.markerhint i{display:block;width:8px;height:8px;border-radius:50%;background:var(--gold-soft);
+  border:1px solid var(--sea);box-shadow:0 0 0 1px var(--gold-soft)}
 
 /* ---------- panel ---------- */
 .panel{background:var(--panel);border-top:1px solid var(--rule);
@@ -136,7 +142,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .list li button{display:flex;width:100%;gap:10px;align-items:baseline;text-align:left;
   padding:9px 14px;border-bottom:1px solid var(--rule)}
 .list li button:hover{background:var(--panel-2)}
-.flag{font-size:16px;line-height:1;flex:none;width:22px}
+.flag{display:inline-flex;align-items:center;justify-content:center;width:22px;min-height:16px;flex:none;font-size:16px;line-height:1}
+.flag-wrap{display:inline-flex;align-items:center;justify-content:center}
+.flag-img{display:block;width:22px;height:15px;object-fit:cover;border:1px solid color-mix(in srgb,var(--border) 70%,transparent);border-radius:1px}
+.flag-fallback{font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif}
 .nm{font-weight:500}
 .cp{margin-left:auto;font-size:13px;color:var(--tx-dim);text-align:right}
 .empty{padding:22px 14px;color:var(--tx-dim)}
@@ -148,7 +157,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .quiz-rules{margin:0 0 17px;padding-left:19px;color:var(--tx-dim);font-size:13px}
 .quiz-progress{display:flex;justify-content:space-between;gap:8px;color:var(--tx-dim);font-size:12px;margin-bottom:13px}
 .quiz-question{font-family:var(--serif);font-size:26px;line-height:1.12;font-weight:400;margin:0 0 7px}
-.quiz-flag{display:inline-block;font-family:var(--sans);font-size:.72em;line-height:1;vertical-align:.08em;margin-right:8px}
+.quiz-flag{display:inline-flex;align-items:center;font-family:var(--sans);font-size:.72em;line-height:1;vertical-align:.08em;margin-right:8px}
+.quiz-flag .flag-img{width:30px;height:20px}
 .quiz-instruction{color:var(--tx-dim);font-size:13px;margin:0 0 13px}
 .quiz-attempts{display:inline-flex;padding:4px 8px;border:1px solid var(--gold);border-radius:2px;color:var(--tx);font-size:12px;margin-bottom:12px}
 .quiz-feedback{min-height:20px;margin:0 0 9px;color:var(--tx-dim);font-size:13px}
@@ -184,8 +194,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .detail{padding:0 14px 26px}
 .back{font-size:13px;font-weight:500;color:var(--tx-dim);padding:2px 0 12px}
 .dhead{display:flex;gap:12px;align-items:flex-start}
-.dflag{font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif;font-size:38px;line-height:1}
-.detail-flag{font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif;font-size:25px;line-height:1}
+.dflag{display:inline-flex;align-items:flex-start;justify-content:center;font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif;font-size:38px;line-height:1}
+.dflag .flag-img{width:52px;height:35px}
+.detail-flag{display:inline-flex;align-items:center;font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif;font-size:25px;line-height:1}
+.detail-flag .flag-img{width:36px;height:24px}
 .dname{font-family:var(--serif);font-size:30px;line-height:1.1;font-weight:400;margin:0}
 .dofficial{font-family:var(--serif);font-style:italic;font-weight:300;color:var(--tx-dim);
   font-size:15px;margin:2px 0 0}
@@ -223,6 +235,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       <div class="readout" id="readout"></div>
     </div>
     <div class="scalebar" id="scalebar">1×</div>
+    <div class="markerhint"><i aria-hidden="true"></i> liten ö / ögrupp</div>
     <div class="zoomer">
       <button id="zin" title="Zooma in" aria-label="Zooma in">+</button>
       <button id="zout" title="Zooma ut" aria-label="Zooma ut">−</button>
@@ -284,7 +297,15 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 (function(){
   "use strict";
   var SVGNS = "http://www.w3.org/2000/svg";
-  var VB = DATA.view, VW = VB[2], VH = VB[3];
+  var FRONT_W = 4000, FRONT_H = 3000;
+  var FRONT_LAT_MIN = -60, FRONT_LAT_MAX = 85;
+  var EQUAL_EARTH_SCALE = 753, EQUAL_EARTH_CX = 2000, EQUAL_EARTH_CY = 983;
+  var EQUAL_EARTH_A1 = 1.340264, EQUAL_EARTH_A2 = -0.081106;
+  var EQUAL_EARTH_A3 = 0.000893, EQUAL_EARTH_A4 = 0.003796;
+  var EQUAL_EARTH_M = Math.sqrt(3) / 2;
+  var FRONT_MERCATOR_TOP = Math.log(Math.tan(Math.PI / 4 + FRONT_LAT_MAX * Math.PI / 360));
+  var FRONT_MERCATOR_BOTTOM = Math.log(Math.tan(Math.PI / 4 + FRONT_LAT_MIN * Math.PI / 360));
+  var VB = [0, 0, FRONT_W, FRONT_H], VW = VB[2], VH = VB[3];
   function bboxFromPath(d){
     var nums = (d.match(/-?\d+(?:\.\d+)?/g) || []).map(Number);
     var xs = [], ys = [];
@@ -296,6 +317,90 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     var y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
     return [x0, y0, Math.max(1, x1 - x0), Math.max(1, y1 - y0)];
   }
+  var ARCHIPELAGO_IDS = new Set([
+    "AUS", "BHS", "CHL", "CUB", "CYP", "DNK", "ESP", "FJI", "FIN", "FRA", "GBR", "GRC", "HRV",
+    "IDN", "IRL", "ISL", "JPN", "KIR", "LKA", "MDG", "MHL", "MDV", "MMR", "MYS", "NLD", "NZL",
+    "PHL", "PNG", "PLW", "SLB", "SWE", "STP", "THA", "TLS", "TON", "TUV", "TUR", "VUT", "WSM",
+    "COM", "CPV", "SYC", "ATG", "BRB", "DMA", "GRD", "KNA", "LCA", "MUS", "VCT", "TTO", "GRL",
+    "COK", "NIU"
+  ]);
+  var SMALL_COUNTRY_AREA = 40000;
+  function pathComponents(d){
+    return d ? d.split(/(?=M)/).filter(function(part){ return part.trim(); }) : [];
+  }
+  function addUniquePoint(points, point){
+    if (!point) return;
+    for (var i = 0; i < points.length; i++){
+      if (Math.hypot(points[i][0] - point[0], points[i][1] - point[1]) < 4) return;
+    }
+    points.push([point[0], point[1]]);
+  }
+  function hitPointsFor(c){
+    var points = [];
+    if (c.hit) addUniquePoint(points, c.hit);
+    var parts = pathComponents(c.d).map(function(part){
+      var b = bboxFromPath(part);
+      return {x:b[0] + b[2] / 2, y:b[1] + b[3] / 2, area:b[2] * b[3]};
+    });
+    var islandRich = ARCHIPELAGO_IDS.has(c.i) ||
+      (c.a != null && c.a <= 400000 && parts.length >= 3);
+    if (islandRich){
+      addUniquePoint(points, c.cp);
+      var largest = parts.reduce(function(max, part){ return Math.max(max, part.area); }, 0);
+      var threshold = c.a != null && c.a <= SMALL_COUNTRY_AREA
+        ? Math.max(.25, largest * .01)
+        : Math.max(4, largest * .015);
+      parts.forEach(function(part){
+        if (part.area >= threshold) addUniquePoint(points, [part.x, part.y]);
+      });
+    } else if (!c.hit && c.a != null && c.a <= SMALL_COUNTRY_AREA){
+      addUniquePoint(points, c.cp);
+    }
+    return points;
+  }
+  function frontPoint(x, y){
+    var equalX = (x - EQUAL_EARTH_CX) / EQUAL_EARTH_SCALE;
+    var equalY = (EQUAL_EARTH_CY - y) / EQUAL_EARTH_SCALE;
+    var theta = equalY;
+    for (var i = 0; i < 12; i++){
+      var theta2 = theta * theta, theta6 = theta2 * theta2 * theta2;
+      var fy = theta * (EQUAL_EARTH_A1 + EQUAL_EARTH_A2 * theta2 +
+        theta6 * (EQUAL_EARTH_A3 + EQUAL_EARTH_A4 * theta2)) - equalY;
+      var fpy = EQUAL_EARTH_A1 + 3 * EQUAL_EARTH_A2 * theta2 +
+        theta6 * (7 * EQUAL_EARTH_A3 + 9 * EQUAL_EARTH_A4 * theta2);
+      theta -= fy / fpy;
+    }
+    var theta2 = theta * theta, theta6 = theta2 * theta2 * theta2;
+    var denominator = EQUAL_EARTH_A1 + 3 * EQUAL_EARTH_A2 * theta2 +
+      theta6 * (7 * EQUAL_EARTH_A3 + 9 * EQUAL_EARTH_A4 * theta2);
+    var lambda = EQUAL_EARTH_M * equalX * denominator / Math.max(0.000001, Math.cos(theta));
+    var phi = Math.asin(Math.max(-1, Math.min(1, Math.sin(theta) / EQUAL_EARTH_M)));
+    var mercator = Math.log(Math.tan(Math.PI / 4 + phi / 2));
+    return [
+      (lambda + Math.PI) / (2 * Math.PI) * FRONT_W,
+      (FRONT_MERCATOR_TOP - mercator) / (FRONT_MERCATOR_TOP - FRONT_MERCATOR_BOTTOM) * FRONT_H
+    ];
+  }
+  function frontPath(d){
+    return d.replace(/([ML])\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/g,
+      function(_, command, x, y){
+        var p = frontPoint(Number(x), Number(y));
+        return command + p[0].toFixed(2) + "," + p[1].toFixed(2);
+      });
+  }
+  function reprojectCountry(c){
+    if (c.d){
+      c.d = frontPath(c.d);
+      c.z = bboxFromPath(c.d);
+    }
+    ["cp", "pt", "hit"].forEach(function(key){
+      if (c[key]) c[key] = frontPoint(c[key][0], c[key][1]);
+    });
+    if (!c.d && c.hit) c.z = [c.hit[0] - 30, c.hit[1] - 30, 60, 60];
+    c.hitPoints = hitPointsFor(c);
+    return c;
+  }
+  DATA.countries.forEach(reprojectCountry);
   var TERRITORY_META = {
     "Kosovo": {i:"XKX", n:"Kosovo", s:"Kosovo", o:"Republiken Kosovo", cap:"Pristina", r:"Europa", sr:"Sydösteuropa", fl:"🇽🇰", cc:"XK", kind:"Omstritt område"},
     "Greenland": {i:"GRL", n:"Greenland", s:"Grönland", o:"Självstyrande del av Kungariket Danmark", cap:"Nuuk", r:"Amerika", sr:"Nordamerika", fl:"🇬🇱", cc:"GL", kind:"Självstyrande område"},
@@ -307,13 +412,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     "Niue": {i:"NIU", n:"Niue", s:"Niue", o:"Niue", cap:"Alofi", r:"Oceanien", sr:"Polynesien", fl:"🇳🇺", cc:"NU", kind:"Självstyrande område"}
   };
   var territoryCountries = DATA.territories.map(function(t, index){
-    var box = bboxFromPath(t.d);
-    return Object.assign({
+    return reprojectCountry(Object.assign({
       i:"T" + String(index + 1).padStart(2, "0"), n:t.n, s:t.n,
       o:"Övrigt kartområde", cap:"—", r:"Övriga", sr:"", a:null,
       fl:"🌐", cc:"", tel:"", cur:"", lng:"", bd:[], ob:0,
-      nt:"", d:t.d, z:box, territory:true
-    }, TERRITORY_META[t.n] || {}, {d:t.d, z:box, territory:true});
+      nt:"", d:t.d, territory:true
+    }, TERRITORY_META[t.n] || {}, {d:t.d, territory:true}));
   });
   var countries = DATA.countries.concat(territoryCountries);
   var memberCount = DATA.countries.filter(function(c){ return !c.ob; }).length;
@@ -333,9 +437,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       '"><title>' + esc(c.s) + ' — ' + esc(c.cap) + (c.territory ? ' (övrigt kartområde)' : (c.ob ? ' (observatörsstat)' : '')) + '</title></path>');
   });
   countries.forEach(function(c){
-    if (!c.hit) return;
-    parts.push('<circle class="hit" cx="' + c.hit[0] + '" cy="' + c.hit[1] + '" r="' + (c.pt ? 22 : 11) +
-      '" data-i="' + c.i + '"><title>' + esc(c.s) + ' — ' + esc(c.cap) + (c.ob ? ' (observatörsstat)' : '') + '</title></circle>');
+    var hitPoints = c.hitPoints || (c.hit ? [c.hit] : []);
+    hitPoints.forEach(function(point, index){
+      parts.push('<circle class="hit" cx="' + point[0].toFixed(2) + '" cy="' + point[1].toFixed(2) +
+        '" r="' + (c.pt ? 24 : 18) + '" data-i="' + c.i + '" data-hit-index="' + index + '"><title>' +
+        esc(c.s) + ' — klickpunkt' + (c.ob ? ' (observatörsstat)' : '') + '</title></circle>');
+    });
   });
   var dots = countries.filter(function(c){ return c.cp && !c.territory; })
     .map(function(c){ return "M" + c.cp[0] + " " + c.cp[1] + "l0 0"; }).join("");
@@ -424,36 +531,47 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     zoomAt(Math.pow(0.9988, e.deltaY * (e.deltaMode === 1 ? 16 : 1)), e.clientX, e.clientY);
   }, {passive:false});
 
-  // pointer drag + pinch
-  var pts = new Map(), last = null, moved = 0, pinchD = 0;
+  // pointer drag + pinch; a click is valid only when the gesture stays below this threshold
+  var DRAG_THRESHOLD = 8, pts = new Map(), last = null, gesture = null, pinchD = 0;
   svg.addEventListener("pointerdown", function(e){
-    if (gameMode !== "quiz") svg.setPointerCapture(e.pointerId);
+    svg.setPointerCapture(e.pointerId);
     pts.set(e.pointerId, {x:e.clientX, y:e.clientY});
-    moved = 0;
-    if (pts.size === 1){ last = {x:e.clientX, y:e.clientY}; svg.classList.add("drag"); }
-    if (pts.size === 2){ pinchD = spread(); }
+    if (pts.size === 1){
+      last = {x:e.clientX, y:e.clientY};
+      gesture = {x:e.clientX, y:e.clientY, dragged:false};
+      svg.classList.add("drag");
+    }
+    if (pts.size === 2){
+      pinchD = spread();
+      if (gesture) gesture.dragged = true;
+    }
   });
   svg.addEventListener("pointermove", function(e){
     if (!pts.has(e.pointerId)) return;
     pts.set(e.pointerId, {x:e.clientX, y:e.clientY});
     if (pts.size === 1 && last){
       var dx = e.clientX - last.x, dy = e.clientY - last.y;
-      moved += Math.abs(dx) + Math.abs(dy);
+      if (gesture && Math.hypot(e.clientX - gesture.x, e.clientY - gesture.y) >= DRAG_THRESHOLD){
+        gesture.dragged = true;
+      }
       tx += dx * S; ty += dy * S;
       last = {x:e.clientX, y:e.clientY};
       draw();
     } else if (pts.size === 2){
       var d = spread(), c = mid();
       if (pinchD > 0 && d > 0){ zoomAt(d / pinchD, c.x, c.y); }
-      pinchD = d; moved += 20;
+      pinchD = d;
+      if (gesture) gesture.dragged = true;
     }
   });
   function endPtr(e){
     pts.delete(e.pointerId);
     if (pts.size < 2) pinchD = 0;
     if (pts.size === 0){
+      var dragged = gesture && gesture.dragged;
       last = null; svg.classList.remove("drag");
-      if (gameMode === "quiz" && moved < 8){
+      if (dragged && e.type === "pointerup") suppressNextClick = true;
+      if (gameMode === "quiz" && !dragged){
         var under=document.elementFromPoint(e.clientX,e.clientY);
         var target=under && under.closest ? under.closest("path.ctry, circle.hit") : null;
         if(target){
@@ -462,6 +580,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
           setTimeout(function(){quizPointerClickHandled=false;},0);
         }
       }
+      gesture = null;
     }
     else { var f = pts.values().next().value; last = {x:f.x, y:f.y}; }
   }
@@ -486,6 +605,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   var selected = null, selEl = null, lockView = false;
   var gameMode = "practice";
   var quizPointerClickHandled = false;
+  var suppressNextClick = false;
   var quiz = {
     active:false, finished:false, kind:"country", length:"10", questions:[], index:0,
     region:"", regionBox:null, score:0, attempts:3, current:null, answered:false,
@@ -493,7 +613,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   };
 
   svg.addEventListener("click", function(e){
-    if (gameMode !== "quiz" && moved > 8) return;
+    if (suppressNextClick){
+      suppressNextClick = false;
+      return;
+    }
     var t = e.target.closest("path.ctry, circle.hit");
     if (!t && typeof e.clientX === "number"){
       var under = document.elementFromPoint(e.clientX,e.clientY);
@@ -533,6 +656,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   function select(id, doZoom){
     if (gameMode === "quiz") return;
     if (selEl) selEl.classList.remove("on");
+    svg.querySelectorAll("circle.hit.on").forEach(function(marker){ marker.classList.remove("on"); });
     selEl = null; selected = null;
     pin.classList.remove("on"); pinring.classList.remove("on"); pinlbl.classList.remove("on");
     if (!id){ showList(); return; }
@@ -541,6 +665,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     selected = c;
     var el = document.getElementById("c-" + id);
     if (el){ selEl = el; el.classList.add("on"); el.parentNode.insertBefore(el, document.getElementById("dots")); }
+    svg.querySelectorAll('circle.hit[data-i="' + id + '"]').forEach(function(marker){ marker.classList.add("on"); });
     if (c.cp){
       pin.setAttribute("d", "M" + c.cp[0] + " " + c.cp[1] + "l0 0");
       pinring.setAttribute("cx", c.cp[0]); pinring.setAttribute("cy", c.cp[1]);
@@ -565,6 +690,16 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   function esc(s){
     return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   }
+  function flagMarkup(c, className, decorative){
+    var cls = className || "flag";
+    var fallback = esc(c.fl || "🌐");
+    var label = "Flagga för " + c.s;
+    var aria = decorative ? ' aria-hidden="true"' : ' role="img" aria-label="' + esc(label) + '"';
+    if (!c.cc) return '<span class="' + cls + ' flag-fallback"' + aria + '>' + fallback + '</span>';
+    var src = "https://flagcdn.com/w40/" + c.cc.toLowerCase() + ".png";
+    return '<span class="' + cls + ' flag-wrap"' + aria + '><img class="flag-img" src="' + src + '" alt="' +
+      (decorative ? "" : esc(label)) + '" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="flag-fallback" hidden aria-hidden="true">' + fallback + '</span></span>';
+  }
   function num(n){
     return n == null ? "—" : Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   }
@@ -580,11 +715,18 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     }
     return copy;
   }
+  function mapElementsFor(c){
+    var elements = [], path = document.getElementById("c-" + c.i);
+    if (path) elements.push(path);
+    svg.querySelectorAll('circle.hit[data-i="' + c.i + '"]').forEach(function(marker){ elements.push(marker); });
+    return elements;
+  }
   function mapElementFor(c){
-    return document.getElementById("c-" + c.i) || svg.querySelector('circle.hit[data-i="' + c.i + '"]');
+    return mapElementsFor(c)[0] || null;
   }
   function clearPracticeSelection(){
     if(selEl)selEl.classList.remove("on");
+    svg.querySelectorAll("circle.hit.on").forEach(function(marker){ marker.classList.remove("on"); });
     selEl=null;selected=null;
     pin.classList.remove("on");pinring.classList.remove("on");pinlbl.classList.remove("on");
   }
@@ -594,12 +736,11 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     });
   }
   function markQuizTarget(){
-    var el=mapElementFor(quiz.current);
-    if(el)el.classList.add("quiz-target");
+    mapElementsFor(quiz.current).forEach(function(el){ el.classList.add("quiz-target"); });
   }
   function markQuizWrong(id){
-    var c=byId[id],el=c&&mapElementFor(c);
-    if(el)el.classList.add("quiz-wrong");
+    var c=byId[id];
+    if(c)mapElementsFor(c).forEach(function(el){ el.classList.add("quiz-wrong"); });
   }
   function quizLengthLabel(){
     return quiz.length === "all" ? "alla" : quiz.length;
@@ -633,7 +774,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     var question=quiz.kind==="country" ? "Hitta " + esc(c.s) : "Vilken är huvudstaden i " + esc(c.s) + "?";
     var instruction=quiz.kind==="country" ? "Klicka på landet på kartan." : "Välj rätt huvudstad bland alternativen.";
     var feedbackClass=quiz.feedbackType ? " " + quiz.feedbackType : "";
-    var flag='<span class="quiz-flag" aria-hidden="true">'+esc(c.fl||"🌐")+'</span>';
+    var flag=flagMarkup(c,"quiz-flag",true);
     var html='<div class="quiz-card"><div class="quiz-progress"><span>Fråga '+(quiz.index+1)+' av '+total+'</span><strong>'+quiz.score+' poäng</strong></div><p class="quiz-kicker">'+(quiz.kind==="country"?'Länder':'Huvudstäder')+'</p><h2 class="quiz-question">'+flag+question+'</h2><p class="quiz-instruction">'+instruction+'</p><span class="quiz-attempts">Försök kvar: '+quiz.attempts+'</span><p class="quiz-feedback'+feedbackClass+'">'+esc(quiz.feedback||"")+'</p>';
     if(quiz.kind==="capital"){
       html+='<div class="quiz-answers">'+quiz.options.map(function(option){
@@ -664,7 +805,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   function resolveQuiz(correct){
     var points=correct?quiz.attempts:0;
     quiz.score+=points;quiz.answered=true;
-    quiz.results.push({name:quiz.current.s,flag:quiz.current.fl,points:points});
+    quiz.results.push({id:quiz.current.i,name:quiz.current.s,flag:quiz.current.fl,points:points});
     if(correct){
       markQuizTarget();quiz.feedback="Rätt! "+points+" poäng.";quiz.feedbackType="good";quiz.autoAdvance=true;
     }
@@ -697,7 +838,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   function finishQuiz(){
     clearQuizMarks();quiz.active=false;quiz.finished=true;
     var max=quiz.questions.length*3;
-    var rows=quiz.results.map(function(result,i){return '<li><span class="quiz-result-country"><span class="flag" aria-hidden="true">'+esc(result.flag||"🌐")+'</span><span><strong>'+(i+1)+'.</strong> '+esc(result.name)+'</span></span><strong>'+result.points+' p</strong></li>';}).join("");
+    var rows=quiz.results.map(function(result,i){var resultCountry=byId[result.id]||{s:result.name,fl:result.flag,cc:""};return '<li><span class="quiz-result-country">'+flagMarkup(resultCountry,"flag",true)+'<span><strong>'+(i+1)+'.</strong> '+esc(result.name)+'</span></span><strong>'+result.points+' p</strong></li>';}).join("");
     pbody.innerHTML='<div class="quiz-card quiz-result"><p class="quiz-kicker">Quiz klart</p><h2>Bra jobbat!</h2><div class="quiz-result-score">'+quiz.score+' / '+max+' poäng</div><p class="quiz-intro">Du klarade '+quiz.questions.length+' '+(quiz.questions.length===1?'fråga':'frågor')+'. Startknappen ovan skapar ett nytt quiz med dina val.</p><ul class="quiz-result-list">'+rows+'</ul></div>';
   }
   function startQuiz(){
@@ -756,7 +897,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       html += '<p class="empty">Inga träffar på ”' + esc(query) + '”.</p>';
     } else {
       html += '<ul class="list">' + rows.map(function(c){
-        return '<li><button data-i="' + c.i + '"><span class="flag">' + c.fl + '</span>' +
+        return '<li><button data-i="' + c.i + '">' + flagMarkup(c,"flag",true) +
                '<span class="nm">' + esc(c.s) + "</span>" +
                (c.territory ? '<span class="tag">ÖVRIGT</span>' : (c.ob ? '<span class="tag">OBS</span>' : "")) +
                '<span class="cp">' + esc(c.cap) + "</span></button></li>";
@@ -778,7 +919,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     var nb = (c.bd || []).map(function(x){ return byId[x]; }).filter(Boolean);
     var html = '<div class="detail">' +
       '<button class="back" id="back">← Alla länder</button>' +
-      '<div class="dhead"><span class="dflag" role="img" aria-label="Flagga för ' + esc(c.s) + '">' + (c.fl || "🌐") + "</span><div>" +
+      '<div class="dhead">' + flagMarkup(c,"dflag",false) + '<div>' +
         '<h2 class="dname">' + esc(c.s) + "</h2>" +
         '<p class="dofficial">' + esc(c.o) + "</p></div></div>" +
       (c.ob ? '<p class="obsline"><strong>Observatörsstat i FN</strong> — inte medlemsstat. ' +
@@ -791,19 +932,19 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
         (c.cur ? "<dt>Valuta</dt><dd>" + esc(c.cur) + "</dd>" : "") +
         (c.lng ? "<dt>Språk</dt><dd>" + esc(c.lng) + "</dd>" : "") +
         (c.tel ? "<dt>Landsnummer</dt><dd>" + esc(c.tel) + "</dd>" : "") +
-        "<dt>Flagga</dt><dd><span class=\"detail-flag\" role=\"img\" aria-label=\"Flagga för " + esc(c.s) + "\">" + (c.fl || "🌐") + "</span></dd>" +
+        "<dt>Flagga</dt><dd>" + flagMarkup(c,"detail-flag",false) + "</dd>" +
         "<dt>Engelskt namn</dt><dd>" + esc(c.n) + "</dd>" +
       "</dl>";
     if (nb.length){
       html += '<div class="nb"><h3>Gränsar till ' + nb.length + " länder</h3><div class=\"chips\">" +
-        nb.map(function(x){ return '<button data-i="' + x.i + '">' + x.fl + " " + esc(x.s) + "</button>"; }).join("") +
+        nb.map(function(x){ return '<button data-i="' + x.i + '">' + flagMarkup(x,"chip-flag",true) + " " + esc(x.s) + '</button>'; }).join("") +
         "</div></div>";
     } else {
       html += '<div class="nb"><h3>Landgränser</h3><div class="chips"><span style="color:var(--tx-dim);font-size:13px">Inga — ö eller enklav utan landgräns.</span></div></div>';
     }
     html += '<p class="note">' + (c.territory
       ? esc(c.kind || "Övrigt kartområde") + ' — visas här som en valbar del av världskartan. Uppgifterna kan skilja sig från en självständig stat och området är inte med i FN:s medlemsantal.'
-      : 'Kartan visar FN:s 193 medlemsstater plus de två observatörsstaterna Palestina och Vatikanstaten, som har streckad gräns. Övriga länder och kartområden är också valbara. Antarktis är utelämnat. Projektion: Equal Earth — ytriktig, så länders storlek går att jämföra direkt. Gränsdata: Natural Earth 1:50 m.') + '</p></div>';
+      : 'Kartan visar FN:s 193 medlemsstater plus de två observatörsstaterna Palestina och Vatikanstaten, som har streckad gräns. Övriga länder och kartområden är också valbara. Antarktis är utelämnat. Projektion: Mercator — en platt framifrån-vy. Gränsdata: Natural Earth 1:50 m.') + '</p></div>';
     pbody.innerHTML = html;
     pbody.scrollTop = 0;
     document.getElementById("back").onclick = function(){ select(null); };

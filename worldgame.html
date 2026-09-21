@@ -77,15 +77,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 #pinlbl{display:none;font-family:var(--sans);font-weight:600;fill:var(--tx);
   paint-order:stroke;stroke:var(--sea);stroke-width:3px;stroke-linejoin:round}
 .z2 #pinlbl.on{display:block}
-.hit{fill:var(--gold-soft);fill-opacity:.9;stroke:var(--sea);stroke-width:1.8;paint-order:stroke;cursor:pointer;opacity:.92}
+.hit{fill:var(--gold-soft);fill-opacity:.9;stroke:var(--sea);stroke-width:1;paint-order:stroke;cursor:pointer;opacity:.92;pointer-events:auto}
 @media (hover:hover){.hit:hover{fill:var(--gold);stroke:var(--tx);opacity:1}}
 .hit.on{fill:var(--gold);stroke:var(--tx);opacity:1}
-.hit.hit-area,
-.hit.hit-area:hover,
-.hit.hit-area.on,
-.hit.hit-area.quiz-target,
-.hit.hit-area.quiz-wrong{fill:transparent!important;stroke:none!important;opacity:0!important;cursor:pointer}
-.hit:not(.hit-area){pointer-events:none}
 .ctry.obs{stroke-dasharray:4 2.5}
 .tag{font-size:10px;font-weight:600;letter-spacing:.06em;color:var(--gold);
   border:1px solid var(--gold);border-radius:2px;padding:1px 4px;flex:none;align-self:center}
@@ -323,46 +317,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     var y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
     return [x0, y0, Math.max(1, x1 - x0), Math.max(1, y1 - y0)];
   }
-  var ARCHIPELAGO_IDS = new Set([
-    "AUS", "BHS", "CHL", "CUB", "CYP", "DNK", "ESP", "FJI", "FIN", "FRA", "GBR", "GRC", "HRV",
-    "IDN", "IRL", "ISL", "JPN", "KIR", "LKA", "MDG", "MHL", "MDV", "MMR", "MYS", "NLD", "NZL",
-    "PHL", "PNG", "PLW", "SLB", "SWE", "STP", "THA", "TLS", "TON", "TUV", "TUR", "VUT", "WSM",
-    "COM", "CPV", "SYC", "ATG", "BRB", "DMA", "GRD", "KNA", "LCA", "MUS", "VCT", "TTO", "GRL",
-    "COK", "NIU"
+  var HARD_TO_CLICK_IDS = new Set([
+    "BHS", "FJI", "IDN", "JPN", "PHL", "SLB", "VUT"
   ]);
-  var SMALL_COUNTRY_AREA = 40000;
-  function pathComponents(d){
-    return d ? d.split(/(?=M)/).filter(function(part){ return part.trim(); }) : [];
-  }
-  function addUniquePoint(points, point){
-    if (!point) return;
-    for (var i = 0; i < points.length; i++){
-      if (Math.hypot(points[i][0] - point[0], points[i][1] - point[1]) < 4) return;
-    }
-    points.push([point[0], point[1]]);
-  }
-  function hitPointsFor(c){
-    var points = [];
-    if (c.hit) addUniquePoint(points, c.hit);
-    var parts = pathComponents(c.d).map(function(part){
-      var b = bboxFromPath(part);
-      return {x:b[0] + b[2] / 2, y:b[1] + b[3] / 2, area:b[2] * b[3]};
-    });
-    var islandRich = ARCHIPELAGO_IDS.has(c.i) ||
-      (c.a != null && c.a <= 400000 && parts.length >= 3);
-    if (islandRich){
-      addUniquePoint(points, c.cp);
-      var largest = parts.reduce(function(max, part){ return Math.max(max, part.area); }, 0);
-      var threshold = c.a != null && c.a <= SMALL_COUNTRY_AREA
-        ? Math.max(.25, largest * .01)
-        : Math.max(4, largest * .015);
-      parts.forEach(function(part){
-        if (part.area >= threshold) addUniquePoint(points, [part.x, part.y]);
-      });
-    } else if (!c.hit && c.a != null && c.a <= SMALL_COUNTRY_AREA){
-      addUniquePoint(points, c.cp);
-    }
-    return points;
+  function hitPointFor(c){
+    if (c.hit) return c.hit;
+    return HARD_TO_CLICK_IDS.has(c.i) && c.cp ? c.cp : null;
   }
   function frontPoint(x, y){
     var equalX = (x - EQUAL_EARTH_CX) / EQUAL_EARTH_SCALE;
@@ -403,7 +363,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       if (c[key]) c[key] = frontPoint(c[key][0], c[key][1]);
     });
     if (!c.d && c.hit) c.z = [c.hit[0] - 30, c.hit[1] - 30, 60, 60];
-    c.hitPoints = hitPointsFor(c);
+    c.hitPoint = hitPointFor(c);
     return c;
   }
   DATA.countries.forEach(reprojectCountry);
@@ -443,15 +403,11 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       '"><title>' + esc(c.s) + ' — ' + esc(c.cap) + (c.territory ? ' (övrigt kartområde)' : (c.ob ? ' (observatörsstat)' : '')) + '</title></path>');
   });
   countries.forEach(function(c){
-    var hitPoints = c.hitPoints || (c.hit ? [c.hit] : []);
-    hitPoints.forEach(function(point, index){
-      parts.push('<circle class="hit" cx="' + point[0].toFixed(2) + '" cy="' + point[1].toFixed(2) +
-        '" r="' + (c.pt ? 7.5 : 5.5) + '" data-i="' + c.i + '" data-hit-index="' + index + '" pointer-events="none"><title>' +
-        esc(c.s) + ' — liten ö eller ögrupp' + (c.ob ? ' (observatörsstat)' : '') + '</title></circle>');
-      parts.push('<circle class="hit hit-area" cx="' + point[0].toFixed(2) + '" cy="' + point[1].toFixed(2) +
-        '" r="' + (c.pt ? 24 : 18) + '" data-i="' + c.i + '" data-hit-index="' + index + '"><title>' +
-        esc(c.s) + ' — klickpunkt' + (c.ob ? ' (observatörsstat)' : '') + '</title></circle>');
-    });
+    var point = c.hitPoint;
+    if (!point) return;
+    parts.push('<circle class="hit" cx="' + point[0].toFixed(2) + '" cy="' + point[1].toFixed(2) +
+      '" r="' + (c.pt ? 3.8 : 3.5) + '" data-i="' + c.i + '"><title>' +
+      esc(c.s) + ' — liten ö eller ögrupp' + (c.ob ? ' (observatörsstat)' : '') + '</title></circle>');
   });
   var dots = countries.filter(function(c){ return c.cp && !c.territory; })
     .map(function(c){ return "M" + c.cp[0] + " " + c.cp[1] + "l0 0"; }).join("");
@@ -581,8 +537,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       last = null; svg.classList.remove("drag");
       if (dragged && e.type === "pointerup") suppressNextClick = true;
       if (gameMode === "quiz" && !dragged){
-        var under=document.elementFromPoint(e.clientX,e.clientY);
-        var target=under && under.closest ? under.closest("path.ctry, circle.hit") : null;
+        var target = targetAt(e.clientX, e.clientY);
         if(target){
           quizPointerClickHandled=true;
           handleQuizMapClick(idOf(target));
@@ -602,6 +557,19 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   function mid(){
     var a = Array.from(pts.values());
     return {x:(a[0].x + a[1].x) / 2, y:(a[0].y + a[1].y) / 2};
+  }
+  var HIT_RADIUS_PX = 14;
+  function targetAt(clientX, clientY){
+    var under = document.elementFromPoint(clientX, clientY);
+    var target = under && under.closest ? under.closest("path.ctry, circle.hit") : null;
+    if (target && target.matches("circle.hit")) return target;
+    var nearest = null, distance = HIT_RADIUS_PX;
+    svg.querySelectorAll("circle.hit").forEach(function(marker){
+      var r = marker.getBoundingClientRect();
+      var d = Math.hypot(clientX - (r.left + r.width / 2), clientY - (r.top + r.height / 2));
+      if (d <= distance){ distance = d; nearest = marker; }
+    });
+    return nearest || target;
   }
 
   document.getElementById("zin").onclick = function(){ var r = svg.getBoundingClientRect(); zoomAt(1.6, r.left + r.width/2, r.top + r.height/2); };
@@ -626,11 +594,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       suppressNextClick = false;
       return;
     }
-    var t = e.target.closest("path.ctry, circle.hit");
-    if (!t && typeof e.clientX === "number"){
-      var under = document.elementFromPoint(e.clientX,e.clientY);
-      t = under && under.closest ? under.closest("path.ctry, circle.hit") : null;
-    }
+    var t = typeof e.clientX === "number" ? targetAt(e.clientX, e.clientY) :
+      (e.target.closest ? e.target.closest("path.ctry, circle.hit") : null);
     if (gameMode === "quiz"){
       if (quizPointerClickHandled){
         quizPointerClickHandled=false;

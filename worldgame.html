@@ -77,9 +77,15 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 #pinlbl{display:none;font-family:var(--sans);font-weight:600;fill:var(--tx);
   paint-order:stroke;stroke:var(--sea);stroke-width:3px;stroke-linejoin:round}
 .z2 #pinlbl.on{display:block}
-.hit{fill:var(--gold-soft);fill-opacity:.9;stroke:var(--sea);stroke-width:4;paint-order:stroke;cursor:pointer;opacity:.92}
+.hit{fill:var(--gold-soft);fill-opacity:.9;stroke:var(--sea);stroke-width:1.8;paint-order:stroke;cursor:pointer;opacity:.92}
 @media (hover:hover){.hit:hover{fill:var(--gold);stroke:var(--tx);opacity:1}}
 .hit.on{fill:var(--gold);stroke:var(--tx);opacity:1}
+.hit.hit-area,
+.hit.hit-area:hover,
+.hit.hit-area.on,
+.hit.hit-area.quiz-target,
+.hit.hit-area.quiz-wrong{fill:transparent!important;stroke:none!important;opacity:0!important;cursor:pointer}
+.hit:not(.hit-area){pointer-events:none}
 .ctry.obs{stroke-dasharray:4 2.5}
 .tag{font-size:10px;font-weight:600;letter-spacing:.06em;color:var(--gold);
   border:1px solid var(--gold);border-radius:2px;padding:1px 4px;flex:none;align-self:center}
@@ -440,6 +446,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     var hitPoints = c.hitPoints || (c.hit ? [c.hit] : []);
     hitPoints.forEach(function(point, index){
       parts.push('<circle class="hit" cx="' + point[0].toFixed(2) + '" cy="' + point[1].toFixed(2) +
+        '" r="' + (c.pt ? 7.5 : 5.5) + '" data-i="' + c.i + '" data-hit-index="' + index + '" pointer-events="none"><title>' +
+        esc(c.s) + ' — liten ö eller ögrupp' + (c.ob ? ' (observatörsstat)' : '') + '</title></circle>');
+      parts.push('<circle class="hit hit-area" cx="' + point[0].toFixed(2) + '" cy="' + point[1].toFixed(2) +
         '" r="' + (c.pt ? 24 : 18) + '" data-i="' + c.i + '" data-hit-index="' + index + '"><title>' +
         esc(c.s) + ' — klickpunkt' + (c.ob ? ' (observatörsstat)' : '') + '</title></circle>');
     });
